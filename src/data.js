@@ -10,7 +10,7 @@ export const profile = {
   linkedin: 'https://www.linkedin.com/in/shrivastavakushagra',
   linkedinHandle: 'shrivastavakushagra',
   // Put a photo at public/photo.jpg to show it in the About section.
-  photo: '/photo.jpg',
+  photo: '/photo.jpeg',
 }
 
 export const nav = [
