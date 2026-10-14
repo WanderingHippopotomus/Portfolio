@@ -1,0 +1,168 @@
+import { useEffect, useRef, useState } from 'react'
+import { profile } from '../data.js'
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const steps = [
+  { key: 'name', placeholder: 'Your name', type: 'text' },
+  { key: 'email', placeholder: 'you@example.com', type: 'email' },
+  { key: 'message', placeholder: 'Type your message', type: 'text' },
+]
+
+export default function Contact() {
+  const [messages, setMessages] = useState([
+    { from: 'bot', text: `Hi, I'm ${profile.firstName}. What's your name?` },
+  ])
+  const [step, setStep] = useState(0)
+  const [value, setValue] = useState('')
+  const [answers, setAnswers] = useState({})
+  const [error, setError] = useState('')
+  const listRef = useRef(null)
+
+  useEffect(() => {
+    const el = listRef.current
+    if (el) el.scrollTop = el.scrollHeight
+  }, [messages])
+
+  const done = step >= steps.length
+
+  const mailto = () => {
+    const subject = encodeURIComponent(`Hello from ${answers.name}`)
+    const body = encodeURIComponent(`${answers.message}\n\n${answers.name}\n${answers.email}`)
+    return `mailto:${profile.email}?subject=${subject}&body=${body}`
+  }
+
+  const submit = (e) => {
+    e.preventDefault()
+    const text = value.trim()
+    if (!text) return
+    const current = steps[step]
+
+    if (current.key === 'email' && !EMAIL_RE.test(text)) {
+      setError('That email address looks incomplete. Try name@example.com.')
+      return
+    }
+    setError('')
+
+    const next = { ...answers, [current.key]: text }
+    setAnswers(next)
+    setValue('')
+
+    const replies = {
+      name: `Nice to meet you, ${text}. What's your email so I can reply?`,
+      email: 'Thanks. What would you like to say?',
+      message: 'Got it. Tap the button below and your email app will open with this message ready to send.',
+    }
+
+    setMessages((m) => [
+      ...m,
+      { from: 'me', text },
+      { from: 'bot', text: replies[current.key] },
+    ])
+    setStep(step + 1)
+  }
+
+  const restart = () => {
+    setMessages([{ from: 'bot', text: `Hi, I'm ${profile.firstName}. What's your name?` }])
+    setStep(0)
+    setAnswers({})
+    setValue('')
+    setError('')
+  }
+
+  return (
+    <section id="contact" className="py-16 pb-28">
+      <h2 className="font-display text-4xl font-extrabold tracking-tight">Contact</h2>
+      <p className="mt-3 max-w-xl text-lg text-ink/80">
+        Hiring, collaborating or up for a game of chess? Start the conversation here, or write
+        straight to{' '}
+        <a className="font-medium underline decoration-peri decoration-2 underline-offset-4" href={`mailto:${profile.email}`}>
+          {profile.email}
+        </a>
+        .
+      </p>
+
+      <div className="mt-8 max-w-xl overflow-hidden rounded-3xl border border-ink/10 bg-white">
+        <div
+          ref={listRef}
+          role="log"
+          aria-live="polite"
+          aria-label="Conversation"
+          className="flex h-80 flex-col gap-3 overflow-y-auto p-5"
+        >
+          {messages.map((m, i) => (
+            <p
+              key={i}
+              className={`max-w-[85%] rounded-2xl px-4 py-2.5 leading-snug ${
+                m.from === 'bot'
+                  ? 'self-start rounded-bl-md bg-sky'
+                  : 'self-end rounded-br-md bg-ink text-paper'
+              }`}
+            >
+              {m.text}
+            </p>
+          ))}
+        </div>
+
+        <div className="border-t border-ink/10 p-4">
+          {done ? (
+            <div className="flex flex-wrap gap-3">
+              <a
+                href={mailto()}
+                className="rounded-full bg-peri px-6 py-3 font-medium text-white transition-colors hover:bg-ink"
+              >
+                Open email to send
+              </a>
+              <button
+                type="button"
+                onClick={restart}
+                className="rounded-full border-2 border-ink px-6 py-3 font-medium transition-colors hover:bg-mint"
+              >
+                Start over
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={submit} className="flex gap-3">
+              <label htmlFor="chat-input" className="sr-only">
+                {steps[step].placeholder}
+              </label>
+              <input
+                id="chat-input"
+                type={steps[step].type}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                placeholder={steps[step].placeholder}
+                autoComplete={steps[step].key === 'email' ? 'email' : steps[step].key === 'name' ? 'name' : 'off'}
+                className="min-w-0 flex-1 rounded-full border-2 border-ink/20 bg-paper px-5 py-3 placeholder:text-ink/45 focus:border-peri focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="rounded-full bg-ink px-6 py-3 font-medium text-paper transition-colors hover:bg-peri"
+              >
+                Send
+              </button>
+            </form>
+          )}
+          {error && (
+            <p role="alert" className="mt-2 text-sm font-medium text-[#B3261E]">
+              {error}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <ul className="mt-8 flex flex-wrap gap-x-8 gap-y-2">
+        <li>
+          <a className="font-medium underline decoration-peri decoration-2 underline-offset-4" href={profile.github}>
+            GitHub: {profile.githubHandle}
+          </a>
+        </li>
+        <li>
+          <a className="font-medium underline decoration-peri decoration-2 underline-offset-4" href={profile.linkedin}>
+            LinkedIn: {profile.linkedinHandle}
+          </a>
+        </li>
+      </ul>
+    </section>
+  )
+}
