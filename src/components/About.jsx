@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { hackathons, interests, profile } from '../data.js'
+import SectionTitle from './SectionTitle.jsx'
 
 function Portrait() {
   const [failed, setFailed] = useState(false)
@@ -29,7 +30,7 @@ function Portrait() {
 export default function About() {
   return (
     <section id="about" className="py-16">
-      <h2 className="font-display text-4xl font-extrabold tracking-tight">About</h2>
+      <SectionTitle>About</SectionTitle>
 
       <div className="mt-10 grid gap-10 md:grid-cols-[260px_1fr]">
         <div className="max-w-[260px]">
@@ -40,7 +41,7 @@ export default function About() {
           <p className="max-w-xl text-lg leading-relaxed">
             I like problems where a model has to be useful to a real person, not just accurate on a
             test set. That means cleaning data, picking a model I can explain, and wrapping it in an
-            app that works offline.
+            app that works offline or on a student's laptop.
           </p>
 
           <div>

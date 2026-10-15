@@ -1,4 +1,8 @@
+import { useState } from 'react'
 import { projects } from '../data.js'
+import Tilt from './Tilt.jsx'
+import SectionTitle from './SectionTitle.jsx'
+import ScamDemo from './ScamDemo.jsx'
 
 function Glyph({ kind }) {
   const common = {
@@ -17,7 +21,7 @@ function Glyph({ kind }) {
       <svg {...common}>
         <path d="M14 94 H146" />
         <path d="M14 20 V94" />
-        <path d="M22 40 C44 28 56 36 74 50 S110 78 138 72" stroke="#6C7BFF" strokeWidth="6" />
+        <path className="glyph-draw" d="M22 40 C44 28 56 36 74 50 S110 78 138 72" stroke="#6C7BFF" strokeWidth="6" />
         <path d="M74 50 V94" strokeDasharray="4 8" />
         <circle cx="74" cy="50" r="7" fill="#F4F5FC" />
       </svg>
@@ -26,8 +30,12 @@ function Glyph({ kind }) {
   if (kind === 'heart') {
     return (
       <svg {...common}>
-        <path d="M80 92 C30 62 30 24 56 24 C70 24 78 34 80 40 C82 34 90 24 104 24 C130 24 130 62 80 92Z" fill="#F4F5FC" />
-        <path d="M56 54 H68 L74 44 L82 66 L88 54 H104" stroke="#6C7BFF" strokeWidth="5" />
+        <path
+          className="glyph-beat"
+          d="M80 92 C30 62 30 24 56 24 C70 24 78 34 80 40 C82 34 90 24 104 24 C130 24 130 62 80 92Z"
+          fill="#F4F5FC"
+        />
+        <path className="glyph-draw" d="M56 54 H68 L74 44 L82 66 L88 54 H104" stroke="#6C7BFF" strokeWidth="5" />
       </svg>
     )
   }
@@ -35,48 +43,80 @@ function Glyph({ kind }) {
     return (
       <svg {...common}>
         <path d="M80 12 L126 28 V54 C126 78 108 94 80 102 C52 94 34 78 34 54 V28Z" fill="#F4F5FC" />
-        <path d="M58 54 L74 70 L104 38" stroke="#6C7BFF" strokeWidth="7" />
+        <path className="glyph-draw" d="M58 54 L74 70 L104 38" stroke="#6C7BFF" strokeWidth="7" />
       </svg>
     )
   }
   return (
     <svg {...common}>
       <path d="M16 36 H56 L64 46 H100 V90 H16Z" fill="#F4F5FC" />
-      <path d="M60 24 H92 L98 32 H144 V76 H112" stroke="#6C7BFF" strokeWidth="5" />
+      <g className="glyph-slide">
+        <path d="M60 24 H92 L98 32 H144 V76 H112" stroke="#6C7BFF" strokeWidth="5" />
+      </g>
     </svg>
+  )
+}
+
+function ProjectCard({ p }) {
+  const [open, setOpen] = useState(false)
+  const demoId = 'scam-demo'
+
+  return (
+    <Tilt className="h-full">
+      <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-ink/10 bg-white">
+        <div className={`${p.tone} flex h-48 items-center justify-center p-8`}>
+          <div className="h-full w-full max-w-[220px] transition-transform duration-300 group-hover:-rotate-2 group-hover:scale-105">
+            <Glyph kind={p.kind} />
+          </div>
+        </div>
+        <div className="flex flex-1 flex-col p-6">
+          <h3 className="font-display text-2xl font-bold leading-tight">{p.title}</h3>
+          <p className="mt-2 leading-relaxed">{p.summary}</p>
+          <p className="mt-3 text-sm leading-relaxed text-ink/70">{p.detail}</p>
+          <ul className="mt-5 flex flex-wrap gap-2">
+            {p.tags.map((t) => (
+              <li
+                key={t}
+                className="rounded-full bg-paper px-3 py-1 text-xs font-medium transition-colors hover:bg-butter"
+              >
+                {t}
+              </li>
+            ))}
+          </ul>
+
+          {p.kind === 'shield' && (
+            <>
+              <button
+                type="button"
+                aria-expanded={open}
+                aria-controls={demoId}
+                onClick={() => setOpen((v) => !v)}
+                className="mt-5 self-start rounded-full bg-ink px-5 py-2 text-sm font-medium text-paper transition-colors hover:bg-peri"
+              >
+                {open ? 'Hide the demo' : 'Try a demo'}
+              </button>
+              {open && <ScamDemo id={demoId} />}
+            </>
+          )}
+        </div>
+      </article>
+    </Tilt>
   )
 }
 
 export default function Projects() {
   return (
     <section id="work" className="py-16">
-      <h2 className="font-display text-4xl font-extrabold tracking-tight">Work</h2>
+      <SectionTitle>Work</SectionTitle>
       <p className="mt-3 max-w-xl text-lg text-ink/80">
-        Four projects, each one a working app rather than a notebook.
+        Four projects, each one a working app rather than a notebook. Hover a card, and try the demo
+        on the scam detector.
       </p>
 
-      <ul className="mt-10 grid gap-6 md:grid-cols-2">
+      <ul className="mt-10 grid items-start gap-6 md:grid-cols-2">
         {projects.map((p) => (
-          <li key={p.title}>
-            <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-ink/10 bg-white">
-              <div className={`${p.tone} flex h-48 items-center justify-center p-8`}>
-                <div className="h-full w-full max-w-[220px] transition-transform duration-300 group-hover:-rotate-2 group-hover:scale-105">
-                  <Glyph kind={p.kind} />
-                </div>
-              </div>
-              <div className="flex flex-1 flex-col p-6">
-                <h3 className="font-display text-2xl font-bold leading-tight">{p.title}</h3>
-                <p className="mt-2 leading-relaxed">{p.summary}</p>
-                <p className="mt-3 text-sm leading-relaxed text-ink/70">{p.detail}</p>
-                <ul className="mt-5 flex flex-wrap gap-2">
-                  {p.tags.map((t) => (
-                    <li key={t} className="rounded-full bg-paper px-3 py-1 text-xs font-medium">
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </article>
+          <li key={p.title} className="h-full">
+            <ProjectCard p={p} />
           </li>
         ))}
       </ul>

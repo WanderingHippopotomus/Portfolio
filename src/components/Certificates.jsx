@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { certificates } from '../data.js'
+import Tilt from './Tilt.jsx'
+import SectionTitle from './SectionTitle.jsx'
 
 function Preview({ cert }) {
   const [failed, setFailed] = useState(false)
@@ -18,7 +20,7 @@ function Preview({ cert }) {
       alt={`Certificate: ${cert.title}`}
       loading="lazy"
       onError={() => setFailed(true)}
-      className="aspect-[4/3] w-full bg-sky object-cover object-top"
+      className="aspect-[4/3] w-full bg-sky object-cover object-top transition-transform duration-500 group-hover:scale-105"
     />
   )
 }
@@ -26,10 +28,8 @@ function Preview({ cert }) {
 export default function Certificates() {
   return (
     <section id="certificates" className="py-16">
-      <h2 className="font-display text-4xl font-extrabold tracking-tight">Certificates</h2>
-      <p className="mt-3 max-w-xl text-lg text-ink/80">
-        Courses and programs I've completed.
-      </p>
+      <SectionTitle>Certificates</SectionTitle>
+      <p className="mt-3 max-w-xl text-lg text-ink/80">Courses and programs I've completed.</p>
 
       {certificates.length === 0 ? (
         <p className="mt-10 max-w-xl rounded-3xl border-2 border-dashed border-ink/25 p-8 text-ink/75">
@@ -41,7 +41,9 @@ export default function Certificates() {
           {certificates.map((c) => {
             const body = (
               <>
-                <Preview cert={c} />
+                <div className="overflow-hidden">
+                  <Preview cert={c} />
+                </div>
                 <div className="p-5">
                   <h3 className="font-display text-xl font-bold leading-tight">{c.title}</h3>
                   <p className="mt-1 text-ink/80">{c.issuer}</p>
@@ -50,16 +52,18 @@ export default function Certificates() {
               </>
             )
             const card =
-              'group block h-full overflow-hidden rounded-3xl border border-ink/10 bg-white transition-shadow hover:shadow-lg'
+              'group block h-full overflow-hidden rounded-3xl border border-ink/10 bg-white transition-shadow hover:shadow-xl'
             return (
               <li key={c.title + (c.date || '')}>
-                {c.link ? (
-                  <a href={c.link} target="_blank" rel="noopener noreferrer" className={card}>
-                    {body}
-                  </a>
-                ) : (
-                  <article className={card}>{body}</article>
-                )}
+                <Tilt className="h-full">
+                  {c.link ? (
+                    <a href={c.link} target="_blank" rel="noopener noreferrer" className={card}>
+                      {body}
+                    </a>
+                  ) : (
+                    <article className={card}>{body}</article>
+                  )}
+                </Tilt>
               </li>
             )
           })}

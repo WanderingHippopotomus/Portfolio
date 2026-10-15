@@ -1,5 +1,7 @@
+import ScrollProgress from './components/ScrollProgress.jsx'
 import Sidebar from './components/Sidebar.jsx'
 import Hero from './components/Hero.jsx'
+import Marquee from './components/Marquee.jsx'
 import Projects from './components/Projects.jsx'
 import About from './components/About.jsx'
 import Chess from './components/Chess.jsx'
@@ -11,10 +13,12 @@ import { profile } from './data.js'
 export default function App() {
   return (
     <>
+      <ScrollProgress />
       <Sidebar />
-      <main className="px-5 pt-20 sm:px-10 lg:ml-64 lg:px-16 lg:pt-6">
+      <main className="overflow-x-clip px-5 pt-20 sm:px-10 lg:ml-64 lg:px-16 lg:pt-6">
         <div className="mx-auto max-w-4xl">
           <Hero />
+          <Marquee />
           <Projects />
           <About />
           <Skills />

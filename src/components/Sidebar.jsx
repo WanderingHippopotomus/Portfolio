@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { nav, profile } from '../data.js'
 
+const SECTION_IDS = nav.map((n) => n.id)
+
 function useActiveSection(ids) {
   const [active, setActive] = useState(ids[0])
 
@@ -35,7 +37,7 @@ function useActiveSection(ids) {
 }
 
 export default function Sidebar() {
-  const active = useActiveSection(nav.map((n) => n.id))
+  const active = useActiveSection(SECTION_IDS)
   const [open, setOpen] = useState(false)
 
   return (
